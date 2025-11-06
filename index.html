@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Rubik:wght@600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --bg1: #0f1724;
@@ -27,8 +28,6 @@
       font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       background: linear-gradient(135deg,var(--bg1) 0%, var(--bg2) 60%);
       color: #e6eef6;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -53,50 +52,14 @@
       gap:16px;
     }
 
-    .logo{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-
     .logo .mark{
       font-family: Rubik, Inter, sans-serif;
       font-weight:700;
       font-size:28px;
-      letter-spacing:0.6px;
       background:linear-gradient(90deg,var(--accent),var(--accent-2));
       -webkit-background-clip:text;
       background-clip:text;
       color:transparent;
-    }
-
-    nav{
-      min-height:42px;
-    }
-
-    nav .menu{
-      display:flex;
-      gap:18px;
-      align-items:center;
-      list-style:none;
-      margin:0;
-      padding:0;
-      height:42px;
-    }
-
-    .menu:empty{
-      width:220px;
-      height:42px;
-      border-radius:10px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border:1px dashed rgba(255,255,255,0.03);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:var(--muted);
-      font-size:13px;
-      padding:8px 12px;
-      backdrop-filter: blur(4px);
     }
 
     main{
@@ -106,36 +69,17 @@
       margin-top:22px;
     }
 
-    .hero{
-      padding:26px;
-      border-radius:14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-      border:1px solid rgba(255,255,255,0.03);
-      min-height:260px;
-    }
-
-    .hero h1{
-      margin:0 0 10px 0;
-      font-size:28px;
-      line-height:1.05;
-      font-weight:800;
-      letter-spacing:-0.5px;
-    }
-
-    .hero p{color:var(--muted); margin-top:0}
-
     .card{
       padding:18px;
       border-radius:12px;
       background:var(--card);
       border:1px solid rgba(255,255,255,0.03);
-      min-height:120px;
     }
 
-    .side{
-      display:flex;
-      flex-direction:column;
-      gap:16px;
+    .hero h1{
+      margin:0 0 10px 0;
+      font-size:28px;
+      font-weight:800;
     }
 
     .cta{
@@ -148,34 +92,73 @@
       color:#071022;
       box-shadow: 0 6px 18px rgba(124,92,255,0.18);
       text-align:center;
+      cursor:pointer;
+      border:none;
+      font-family:inherit;
+      font-size:inherit;
+    }
+
+    .cta:hover{
+      opacity:0.9;
     }
 
     footer{
       margin-top:18px;
       display:flex;
-      align-items:center;
       justify-content:space-between;
-      gap:12px;
-      color:var(--muted);
       font-size:13px;
+      color:var(--muted);
       padding-top:6px;
       border-top:1px solid rgba(255,255,255,0.02);
     }
 
-    .meta{font-size:13px}
-
-    @media (max-width:880px){
-      main{grid-template-columns:1fr;}
-      .logo .mark{font-size:22px}
-      .menu:empty{width:160px}
+    .timeline {
+      margin-top: 12px;
+      border-left: 2px solid var(--accent);
+      padding-left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    .logo .mark{transform-origin:left; animation:floatIn 700ms cubic-bezier(.2,.9,.2,1);}
-    .hero h1{animation:slideUp 600ms 100ms both}
-    .hero p{animation:slideUp 600ms 200ms both}
+    .timeline-item {
+      position: relative;
+      padding-left: 10px;
+    }
 
-    @keyframes floatIn{from{transform:translateY(-6px) scale(.98);opacity:0}to{transform:none;opacity:1}}
-    @keyframes slideUp{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -21px;
+      top: 6px;
+      width: 10px;
+      height: 10px;
+      background: var(--accent-2);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--accent);
+    }
+
+    .timeline-item h4 {
+      margin: 0;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .timeline-item p {
+      margin: 2px 0 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      body {
+        padding: 20px;
+      }
+    }
 
   </style>
 </head>
@@ -185,7 +168,6 @@
       <div class="logo">
         <div class="mark">AnyJinx</div>
       </div>
-
       <nav aria-label="Hlavní menu">
         <ul class="menu" aria-hidden="true"></ul>
       </nav>
@@ -194,7 +176,7 @@
     <main>
       <section class="hero card">
         <h1>AnyJinx</h1>
-        <p>Jsme malý a zapálený tým, co si hraje s nápady. Hra <strong>AnyWays</strong> je momentálně ve vývoji — hledáme směr, ladíme mechaniky a zkoušíme, co lidi nejvíc baví. Tady na stránce brzy přibudou novinky, screenshoty a možnost přihlásit se do testů.</p>
+        <p>Jsme malý a zapálený tým, co si hraje s nápady. Hra <strong>AnyWays</strong> je momentálně ve vývoji — hledáme směr, ladíme mechaniky a zkoušíme, co lidi nejvíc baví.</p>
 
         <div style="margin-top:18px">
           <a class="cta" href="https://1url.cz/@sjsjvvekzfdwo" target="_blank">Poslat nápad do hry</a>
@@ -202,9 +184,12 @@
       </section>
 
       <aside class="side">
-        <div class="card">
-          <h3 style="margin:0 0 8px 0">Status</h3>
-          <p style="margin:0;color:var(--muted)">Vývoj probíhá. Aktuální fáze: prototyp → iterace → alpha (interní).</p>
+        <div class="card" id="stav-card">
+          <h3 style="margin:0 0 8px 0">STAV</h3>
+          <p id="stav-text" style="margin:0;color:var(--muted)">Načítání...</p>
+          <div style="margin-top:12px">
+            <button class="cta" id="btn-historie">Zobrazit historii</button>
+          </div>
         </div>
 
         <div class="card">
@@ -216,9 +201,67 @@
     </main>
 
     <footer>
-      <div class="meta">Jsme <strong>AnyJinx</strong> — pracujeme na hře <em>AnyWays</em>. Díky za podporu ♥</div>
-      <div style="color:var(--muted);font-size:12px">© AnyJinx — coming soon</div>
+      <div>Jsme <strong>AnyJinx</strong> — pracujeme na hře <em>AnyWays</em>. Díky za podporu ♥</div>
+      <div style="font-size:12px">© AnyJinx — coming soon</div>
     </footer>
   </div>
+
+  <script>
+    async function nactiStav() {
+      try {
+        const res = await fetch('his.txt');
+        if (!res.ok) throw new Error('Soubor nenalezen');
+        const text = await res.text();
+
+        const lines = text.trim().split('\n').filter(l => l.includes(':'));
+        if (!lines.length) {
+          document.getElementById('stav-text').textContent = 'Zatím žádný záznam.';
+          return;
+        }
+
+        const posledni = lines[lines.length - 1];
+        const [datum, popis] = posledni.split(':').map(s => s.trim());
+
+        document.getElementById('stav-text').innerHTML = `<strong>${datum}</strong><br>${popis}`;
+      } catch (e) {
+        document.getElementById('stav-text').textContent = 'Zatím žádný záznam.';
+      }
+    }
+
+    async function zobrazHistorii() {
+      try {
+        const res = await fetch('his.txt');
+        if (!res.ok) throw new Error('Soubor nenalezen');
+        const text = await res.text();
+
+        const lines = text.trim().split('\n').filter(l => l.includes(':'));
+        
+        if (!lines.length) {
+          alert('Historie je prázdná.');
+          return;
+        }
+
+        const timelineHTML = lines.reverse().map(line => {
+          const [datum, popis] = line.split(':').map(s => s.trim());
+          return `<div class="timeline-item"><h4>${datum}</h4><p>${popis}</p></div>`;
+        }).join('');
+
+        const card = document.getElementById('stav-card');
+        card.innerHTML = `
+          <h3 style="margin:0 0 8px 0">Historie vývoje</h3>
+          <div class="timeline">${timelineHTML}</div>
+          <div style="margin-top:16px"><button class="cta" id="btn-zpet">Zpět</button></div>
+        `;
+
+        document.getElementById('btn-zpet').addEventListener('click', () => location.reload());
+      } catch (e) {
+        alert('Nepodařilo se načíst historii.');
+      }
+    }
+
+    document.getElementById('btn-historie').addEventListener('click', zobrazHistorii);
+
+    nactiStav();
+  </script>
 </body>
 </html>
