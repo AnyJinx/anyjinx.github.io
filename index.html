@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="cs">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -168,7 +168,7 @@
       <div class="logo">
         <div class="mark">AnyJinx</div>
       </div>
-      <nav aria-label="Hlavní menu">
+      <nav aria-label="Main menu">
         <ul class="menu" aria-hidden="true"></ul>
       </nav>
     </header>
@@ -176,32 +176,51 @@
     <main>
       <section class="hero card">
         <h1>AnyJinx</h1>
-        <p>Jsme malý a zapálený tým, co si hraje s nápady. Hra <strong>AnyWays</strong> je momentálně ve vývoji — hledáme směr, ladíme mechaniky a zkoušíme, co lidi nejvíc baví.</p>
+        <p>We're a small and passionate team playing with ideas. The game <strong>AnyWays</strong> is currently in development — we're finding direction, tuning mechanics, and testing what people enjoy most.</p>
 
-        <div style="margin-top:18px">
-          <a class="cta" href="https://1url.cz/@sjsjvvekzfdwo" target="_blank">Poslat nápad do hry</a>
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <a class="cta" href="https://1url.cz/@sjsjvvekzfdwo" target="_blank">Submit an Idea</a>
+          <a class="cta" href="https://1url.cz/@ytjinxany1234" target="_blank">Follow us on YT</a>
+        </div>
+
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06)">
+          <h3 style="margin:0 0 12px 0">Team Members</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="font-weight:600;color:#fff;margin-bottom:2px">GingerKabra</div>
+              <div style="font-size:13px;color:var(--muted)">Designs details for every game element, documents ideas, and searches for 2D textures</div>
+            </div>
+            <div>
+              <div style="font-weight:600;color:#fff;margin-bottom:2px">Forgoten</div>
+              <div style="font-size:13px;color:var(--muted)">Develops the entire codebase</div>
+            </div>
+            <div>
+              <div style="font-weight:600;color:#fff;margin-bottom:2px">Problematic</div>
+              <div style="font-size:13px;color:var(--muted)">Creates or sources 3D textures</div>
+            </div>
+          </div>
         </div>
       </section>
 
       <aside class="side">
         <div class="card" id="stav-card">
-          <h3 style="margin:0 0 8px 0">STAV</h3>
-          <p id="stav-text" style="margin:0;color:var(--muted)">Načítání...</p>
+          <h3 style="margin:0 0 8px 0">STATUS</h3>
+          <p id="stav-text" style="margin:0;color:var(--muted)">Loading...</p>
           <div style="margin-top:12px">
-            <button class="cta" id="btn-historie">Zobrazit historii</button>
+            <button class="cta" id="btn-historie">View History</button>
           </div>
         </div>
 
         <div class="card">
-          <h3 style="margin:0 0 8px 0">Kontakt</h3>
+          <h3 style="margin:0 0 8px 0">Contact</h3>
           <p style="margin:0;color:var(--muted)">anyjinx@seznam.cz</p>
-          <div style="margin-top:12px"><a class="cta" href="mailto:anyjinx@seznam.cz">Napiš nám</a></div>
+          <div style="margin-top:12px"><a class="cta" href="mailto:anyjinx@seznam.cz">Email Us</a></div>
         </div>
       </aside>
     </main>
 
     <footer>
-      <div>Jsme <strong>AnyJinx</strong> — pracujeme na hře <em>AnyWays</em>. Díky za podporu ♥</div>
+      <div>We are <strong>AnyJinx</strong> — working on the game <em>AnyWays</em>. Thanks for your support ♥</div>
       <div style="font-size:12px">© AnyJinx — coming soon</div>
     </footer>
   </div>
@@ -210,12 +229,12 @@
     async function nactiStav() {
       try {
         const res = await fetch('his.txt');
-        if (!res.ok) throw new Error('Soubor nenalezen');
+        if (!res.ok) throw new Error('File not found');
         const text = await res.text();
 
         const lines = text.trim().split('\n').filter(l => l.includes(':'));
         if (!lines.length) {
-          document.getElementById('stav-text').textContent = 'Zatím žádný záznam.';
+          document.getElementById('stav-text').textContent = 'No records yet.';
           return;
         }
 
@@ -224,20 +243,20 @@
 
         document.getElementById('stav-text').innerHTML = `<strong>${datum}</strong><br>${popis}`;
       } catch (e) {
-        document.getElementById('stav-text').textContent = 'Zatím žádný záznam.';
+        document.getElementById('stav-text').textContent = 'No records yet.';
       }
     }
 
     async function zobrazHistorii() {
       try {
         const res = await fetch('his.txt');
-        if (!res.ok) throw new Error('Soubor nenalezen');
+        if (!res.ok) throw new Error('File not found');
         const text = await res.text();
 
         const lines = text.trim().split('\n').filter(l => l.includes(':'));
         
         if (!lines.length) {
-          alert('Historie je prázdná.');
+          alert('History is empty.');
           return;
         }
 
@@ -248,14 +267,14 @@
 
         const card = document.getElementById('stav-card');
         card.innerHTML = `
-          <h3 style="margin:0 0 8px 0">Historie vývoje</h3>
+          <h3 style="margin:0 0 8px 0">Development History</h3>
           <div class="timeline">${timelineHTML}</div>
-          <div style="margin-top:16px"><button class="cta" id="btn-zpet">Zpět</button></div>
+          <div style="margin-top:16px"><button class="cta" id="btn-zpet">Back</button></div>
         `;
 
         document.getElementById('btn-zpet').addEventListener('click', () => location.reload());
       } catch (e) {
-        alert('Nepodařilo se načíst historii.');
+        alert('Failed to load history.');
       }
     }
 
