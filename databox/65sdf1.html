@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="cs">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -63,102 +63,86 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="logo"><div class="mark">AnyJinx — Protected</div></div>
+      <div class="logo"><div class="mark">AnyJinx — DataBox</div></div>
     </header>
 
     <section class="card">
-      <h3 style="margin:0 0 8px 0">Zadej heslo</h3>
+      <h3 style="margin:0 0 8px 0">Enter password to access data</h3>
       <div id="form-area">
         <div class="form-row">
-          <input id="pw" type="password" placeholder="Zadej heslo">
-          <button id="ok" class="btn">Potvrdit</button>
-        
+          <input id="pw" type="password" placeholder="Enter password">
+          <button id="ok" class="btn">Confirm</button>
+        </div>
+        <div class="note">Protected access — client-side only (for internal use).</div>
+      </div>
 
       <div id="success-area" style="display:none;margin-top:12px">
-        <h4 style="margin:0 0 8px 0">Obsah edata.txt</h4>
+        <h4 style="margin:0 0 8px 0">Saved Data</h4>
         <textarea id="edata" readonly></textarea>
         <div class="controls">
-          <button id="copy" class="btn">Kopírovat</button>
-          <button id="refresh" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);box-shadow:none">Obnovit obsah</button>
+          <button id="copy" class="btn">Copy</button>
+          <button id="refresh" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);box-shadow:none">Refresh</button>
         </div>
         <div id="debug" class="debug" aria-live="polite"></div>
       </div>
-
     </section>
-
   </div>
 
   <script>
-    // jednoduché klientské heslo (jak požadováno)
     const CORRECT = 'Noro19';
 
-    const possiblePaths = [
-      'edata.txt',
-      './edata.txt',
-      window.location.pathname.replace(/\/[^/]*$/, '') + '/edata.txt',
-      '/' + 'edata.txt'
-    ];
-
-    function escapeHtml(s){return s.replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c));}
-
-    async function tryFetch(paths){
-      let lastErr = null;
-      for(const p of paths){
-        try{
-          const res = await fetch(p, {cache:'no-store'});
-          if(res.ok){ const text = await res.text(); return {ok:true,path:p,text}; }
-          else lastErr = `status:${res.status} for ${p}`;
-        }catch(e){ lastErr = e.message + ' for ' + p; }
-      }
-      return {ok:false,error:lastErr};
-    }
-
-    async function loadEdata(){
-      const dbg = document.getElementById('debug'); dbg.textContent='';
-      if(location.protocol==='file:'){
-        dbg.textContent = 'Lokální režim (file://) — fetch souborů může selhat. Pro test spusť lokální server (python -m http.server) nebo nahraj na GitHub Pages.';
+    async function loadEdata() {
+      const dbg = document.getElementById('debug');
+      dbg.textContent = '';
+      try {
+        const res = await fetch('./edata.txt', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const txt = await res.text();
+        dbg.textContent = 'Loaded successfully from ./edata.txt';
+        return txt;
+      } catch (e) {
+        dbg.textContent = 'Error loading file: ' + e.message + ' (Make sure edata.txt is in the same folder as this HTML file).';
         return null;
       }
-      const attempt = await tryFetch(possiblePaths);
-      if(!attempt.ok){ dbg.textContent = 'Chyba: ' + attempt.error + '. Ověř, že edata.txt je ve stejném adresáři jako tento soubor (case-sensitive) a publikovaný.'; return null; }
-      dbg.textContent = 'Načteno z ' + attempt.path;
-      return attempt.text;
     }
 
-    document.getElementById('ok').addEventListener('click', async ()=>{
-      const val = document.getElementById('pw').value;
-      const dbg = document.getElementById('debug'); dbg.textContent='';
-      if(val === CORRECT){
-        // úspěch: skryj formulář, ukaž obsah
-        document.getElementById('form-area').style.display='none';
-        document.getElementById('success-area').style.display='block';
+    document.getElementById('ok').addEventListener('click', async () => {
+      const val = document.getElementById('pw').value.trim();
+      const dbg = document.getElementById('debug');
+      dbg.textContent = '';
+      if (val === CORRECT) {
+        document.getElementById('form-area').style.display = 'none';
+        document.getElementById('success-area').style.display = 'block';
         const txt = await loadEdata();
         document.getElementById('edata').value = txt || '';
       } else {
-        dbg.textContent = 'Špatné heslo.';
+        dbg.textContent = 'Wrong password.';
       }
     });
 
-    document.getElementById('copy').addEventListener('click', async ()=>{
+    document.getElementById('copy').addEventListener('click', async () => {
       const txt = document.getElementById('edata').value;
-      try{
+      try {
         await navigator.clipboard.writeText(txt);
-        document.getElementById('debug').textContent = 'Zkopírováno do schránky.';
-      }catch(e){
-        // fallback
+        document.getElementById('debug').textContent = 'Copied to clipboard.';
+      } catch {
         document.getElementById('edata').select();
-        try{ document.execCommand('copy'); document.getElementById('debug').textContent = 'Zkopírováno (fallback).'; }
-        catch(e2){ document.getElementById('debug').textContent = 'Kopírování selhalo — vyber text ručně.'; }
+        document.execCommand('copy');
+        document.getElementById('debug').textContent = 'Copied (fallback).';
       }
     });
 
-    document.getElementById('refresh').addEventListener('click', async ()=>{
+    document.getElementById('refresh').addEventListener('click', async () => {
       const txt = await loadEdata();
       document.getElementById('edata').value = txt || '';
     });
 
-    // enter key in password input
-    document.getElementById('pw').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); document.getElementById('ok').click(); } });
+    document.getElementById('pw').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('ok').click();
+      }
+    });
   </script>
 </body>
 </html>
