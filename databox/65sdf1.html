@@ -95,13 +95,13 @@
       const dbg = document.getElementById('debug');
       dbg.textContent = '';
       try {
-        const res = await fetch('./edata.txt', { cache: 'no-store' });
+        const res = await fetch('./65sdf1.txt', { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const txt = await res.text();
-        dbg.textContent = 'Loaded successfully from ./edata.txt';
+        dbg.textContent = 'Loaded successfully from ./65sdf1.txt';
         return txt;
       } catch (e) {
-        dbg.textContent = 'Error loading file: ' + e.message + ' (Make sure edata.txt is in the same folder as this HTML file).';
+        dbg.textContent = 'Error loading file: ' + e.message + ' (Make sure 65sdf1.txt is in the same folder as this HTML file).';
         return null;
       }
     }
