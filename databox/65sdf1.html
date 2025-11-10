@@ -67,14 +67,16 @@
     </header>
 
     <section class="card">
-      <h3 style="margin:0 0 8px 0">Enter password to access data</h3>
+      <h3 style="margin:0 0 8px 0">Enter password</h3>
       <div id="form-area">
         <div class="form-row">
           <input id="pw" type="password" placeholder="Enter password">
-          <button id="ok" class="btn">Confirm</button>
+          <button id="ok" class="btn">Enter</button>
+        </div>
+      </div>
 
       <div id="success-area" style="display:none;margin-top:12px">
-        <h4 style="margin:0 0 8px 0">Saved Data</h4>
+        <h4 style="margin:0 0 8px 0">Saved data</h4>
         <textarea id="edata" readonly></textarea>
         <div class="controls">
           <button id="copy" class="btn">Copy</button>
@@ -82,34 +84,59 @@
         </div>
         <div id="debug" class="debug" aria-live="polite"></div>
       </div>
+
     </section>
+
   </div>
 
   <script>
     const CORRECT = 'Noro19';
+    const possiblePaths = [
+      '65sdf1.txt',
+      './65sdf1.txt',
+      window.location.pathname.replace(/\/[^/]*$/, '') + '/65sdf1.txt',
+      '/' + '65sdf1.txt'
+    ];
 
-    async function loadEdata() {
-      const dbg = document.getElementById('debug');
-      dbg.textContent = '';
-      try {
-        const res = await fetch('./65sdf1.txt', { cache: 'no-store' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const txt = await res.text();
-        dbg.textContent = 'Loaded successfully from ./65sdf1.txt';
-        return txt;
-      } catch (e) {
-        dbg.textContent = 'Error loading file: ' + e.message + ' (Make sure 65sdf1.txt is in the same folder as this HTML file).';
-        return null;
+    async function tryFetch(paths){
+      let lastErr = null;
+      for(const p of paths){
+        try{
+          const res = await fetch(p, {cache:'no-store'});
+          if(res.ok){
+            const text = await res.text();
+            return {ok:true,path:p,text};
+          } else {
+            lastErr = `status:${res.status} for ${p}`;
+          }
+        }catch(e){
+          lastErr = e.message + ' for ' + p;
+        }
       }
+      return {ok:false,error:lastErr};
     }
 
-    document.getElementById('ok').addEventListener('click', async () => {
-      const val = document.getElementById('pw').value.trim();
-      const dbg = document.getElementById('debug');
-      dbg.textContent = '';
-      if (val === CORRECT) {
-        document.getElementById('form-area').style.display = 'none';
-        document.getElementById('success-area').style.display = 'block';
+    async function loadEdata(){
+      const dbg = document.getElementById('debug'); dbg.textContent='';
+      if(location.protocol==='file:'){
+        dbg.textContent = 'Local file mode — fetch may fail. Upload to GitHub Pages for it to work.';
+        return null;
+      }
+      const attempt = await tryFetch(possiblePaths);
+      if(!attempt.ok){
+        dbg.textContent = 'Error: ' + attempt.error + '. Make sure 65sdf1.txt is in the same folder as this HTML file.';
+        return null;
+      }
+      dbg.textContent = 'Loaded from ' + attempt.path;
+      return attempt.text;
+    }
+
+    document.getElementById('ok').addEventListener('click', async ()=>{
+      const val = document.getElementById('pw').value;
+      const dbg = document.getElementById('debug'); dbg.textContent='';
+      if(val === CORRECT){
+        document.getElementById('form-area').style.display='none';
+        document.getElementById('success-area').style.display='block';
         const txt = await loadEdata();
         document.getElementById('edata').value = txt || '';
       } else {
@@ -117,28 +144,29 @@
       }
     });
 
-    document.getElementById('copy').addEventListener('click', async () => {
+    document.getElementById('copy').addEventListener('click', async ()=>{
       const txt = document.getElementById('edata').value;
-      try {
+      try{
         await navigator.clipboard.writeText(txt);
         document.getElementById('debug').textContent = 'Copied to clipboard.';
-      } catch {
+      }catch(e){
         document.getElementById('edata').select();
-        document.execCommand('copy');
-        document.getElementById('debug').textContent = 'Copied (fallback).';
+        try{
+          document.execCommand('copy');
+          document.getElementById('debug').textContent = 'Copied (fallback).';
+        }catch(e2){
+          document.getElementById('debug').textContent = 'Copy failed — select manually.';
+        }
       }
     });
 
-    document.getElementById('refresh').addEventListener('click', async () => {
+    document.getElementById('refresh').addEventListener('click', async ()=>{
       const txt = await loadEdata();
       document.getElementById('edata').value = txt || '';
     });
 
-    document.getElementById('pw').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('ok').click();
-      }
+    document.getElementById('pw').addEventListener('keydown', (e)=>{
+      if(e.key==='Enter'){ e.preventDefault(); document.getElementById('ok').click(); }
     });
   </script>
 </body>
