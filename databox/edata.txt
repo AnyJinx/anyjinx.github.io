@@ -1,0 +1,85 @@
+### 🔰 1. Příprava Testovacího Prostředí
+Než začneš, ujisti se, že:
+
+- *Máš oprávnění* od rodičů či správce (to máš, jak vím).
+- Testuješ na *starém nebo testovacím zařízení* — žádná reálná data.
+- Máš nainstalovanou aplikaci *Family Link* a systém je propojený s rodičovským účtem.
+- Aktivuj *ladicí režim (Developer Options)*:
+  - Nastavení → O telefonu → 7x klepni na „Číslo sestavy“.
+  - Nastavení → Možnosti pro vývojáře → Povol ladění USB.
+
+---
+
+### 🛠 2. Základní Průzkum bez Rootu
+Nejsnazší začátek pro nezkušeného testera:
+
+#### A. Informace o zařízení / Family Linku:
+- Zapiš si verzi Androidu, verzi aplikace Family Link a typ zařízení.
+- Podívej se do nastavení aplikací (Nastavení → Aplikace → Rodičovská kontrola), jestli můžeš:
+  - Vynutit ukončení aplikace (ale pravděpodobně to nepůjde kvůli právům správce).
+  - Smazat data (pokud je tlačítko aktivní – pravděpodobně ne).
+
+#### B. Zkoušej odpojení od internetu:
+- Vypni Wi-Fi i mobilní data na 10 minut.
+- Sleduj, jestli se nějaké funkce Family Linku "přestanou chovat" nebo zda-li se něco změní.
+- Při opětovném připojení sleduj, jestli se něco "aktualizuje", případně jestli se něco zalogovalo na rodičovském zařízení.
+
+#### C. Pozoruj notifikace:
+- Nainstaluj si nějakou jednoduchou aplikaci (např. kalkulačku ze „Store“).
+- Podívej se, jestli se rodiči na jejich zařízení zobrazila notifikace o instalaci.
+- Objeví se nějaký mail nebo varování?
+- Stejně tak to vyzkoušej s odinstalací – bude rodič upozorněn?
+
+---
+
+### 🔍 3. Jednoduché Testování Chování
+Bez rootu můžeš testovat různé scénáře:
+
+#### A. Změna času na zařízení:
+- Pokud jde změnit systémový čas (například zpět o několik hodin), uvidíš, že se může narušit logika časovačů v Family Linku.
+- Někdy se může stát, že se časové limity prodlouží, nebo aplikace spadne.
+
+#### B. Testování „přeskočení“ časovače:
+- Nastav si časovač ve Family Linku na 30 minut.
+- Zkus zařízení přepnout do režimu „Létání“ po dobu delší než je časovač.
+- Zjisti, jak se aplikace zachová – resetuje se časovač, nebo bude ignorovat čas?
+
+---
+
+### 🧪 4. Použití ADB (bez rootu)
+ADB je nástroj pro komunikaci s Androidem z počítače (většinou přes USB).
+
+#### A. Nainstaluj ADB na PC:
+- Stáhni si „Minimal ADB and Fastboot“ nebo „Android SDK“.
+- Připoj Android k počítači a povol ladění USB.
+- Vyzkoušej příkazy jako:
+  bash
+  adb devices
+  adb shell pm list packages | grep family
+  
+  To ti zobrazí, jestli je Family Link instalován.
+
+#### B. Následně můžeš zkusit:
+  bash
+  adb shell am force-stop com.google.android.apps.kids.familylink
+  
+  Tento příkaz "natvrdo" ukončí aplikaci, ale může se okamžitě znovu spustit nebo třeba odeslat notifikaci.
+
+---
+
+### 💡 5. Jakékoliv Abnormity Poznamenej!
+Pokud se ti během testování podaří:
+- Něco obejít,
+- Způsobit pád aplikace,
+- Vyvolat chybu nebo neočekávané chování,
+
+Udělej si poznámku a zjisti, jestli máš v rodičovském rozhraní (např. web nebo jiné zařízení) nějaké záznamy nebo notifikace.
+
+---
+
+### 🧭 Další Kroky
+Pokud zjistíš nějakou slabou stránku (např. že aplikace nehlásí něco, nebo se dá snadno přeskočit), můžeš pokračovat třeba:
+- Hlubším testováním s rootem (pro zkušenější testery),
+- Reversingem APK (rozbalením a analýzou obsahu aplikace),
+- Analýzou síťové komunikace.
+

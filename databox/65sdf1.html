@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AnyJinx — DataBox</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Rubik:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1: #0f1724;
+      --bg2: #071022;
+      --accent: #7c5cff;
+      --accent-2: #00e0b8;
+      --muted: #9aa4b2;
+      --card: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(135deg,var(--bg1) 0%, var(--bg2) 60%);
+      color: #e6eef6;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:820px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:16px;
+      padding:22px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
+      backdrop-filter: blur(6px) saturate(120%);
+    }
+
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .logo .mark{font-family:Rubik, Inter, sans-serif;font-weight:700;font-size:22px;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;color:transparent}
+
+    .card{padding:18px;border-radius:12px;background:var(--card);border:1px solid rgba(255,255,255,0.03)}
+
+    .form-row{display:flex;gap:10px;align-items:center}
+    input[type="password"]{flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.05);color:#fff;font-size:15px}
+    button.btn{padding:10px 14px;border-radius:8px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#071022;font-weight:700;cursor:pointer}
+
+    .note{color:var(--muted);font-size:13px;margin-top:10px}
+
+    textarea#edata{width:100%;min-height:220px;padding:12px;border-radius:10px;border:none;background:rgba(255,255,255,0.03);color:#fff;font-family:inherit;font-size:14px;resize:vertical}
+
+    .controls{display:flex;gap:10px;margin-top:10px}
+
+    .debug{color:#ffb86b;margin-top:10px;font-size:13px}
+
+    @media (max-width:560px){.form-row{flex-direction:column;align-items:stretch}button.btn{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo"><div class="mark">AnyJinx — Protected</div></div>
+    </header>
+
+    <section class="card">
+      <h3 style="margin:0 0 8px 0">Zadej heslo</h3>
+      <div id="form-area">
+        <div class="form-row">
+          <input id="pw" type="password" placeholder="Zadej heslo">
+          <button id="ok" class="btn">Potvrdit</button>
+        
+
+      <div id="success-area" style="display:none;margin-top:12px">
+        <h4 style="margin:0 0 8px 0">Obsah edata.txt</h4>
+        <textarea id="edata" readonly></textarea>
+        <div class="controls">
+          <button id="copy" class="btn">Kopírovat</button>
+          <button id="refresh" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);box-shadow:none">Obnovit obsah</button>
+        </div>
+        <div id="debug" class="debug" aria-live="polite"></div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script>
+    // jednoduché klientské heslo (jak požadováno)
+    const CORRECT = 'Noro19';
+
+    const possiblePaths = [
+      'edata.txt',
+      './edata.txt',
+      window.location.pathname.replace(/\/[^/]*$/, '') + '/edata.txt',
+      '/' + 'edata.txt'
+    ];
+
+    function escapeHtml(s){return s.replace(/[&<>\"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c));}
+
+    async function tryFetch(paths){
+      let lastErr = null;
+      for(const p of paths){
+        try{
+          const res = await fetch(p, {cache:'no-store'});
+          if(res.ok){ const text = await res.text(); return {ok:true,path:p,text}; }
+          else lastErr = `status:${res.status} for ${p}`;
+        }catch(e){ lastErr = e.message + ' for ' + p; }
+      }
+      return {ok:false,error:lastErr};
+    }
+
+    async function loadEdata(){
+      const dbg = document.getElementById('debug'); dbg.textContent='';
+      if(location.protocol==='file:'){
+        dbg.textContent = 'Lokální režim (file://) — fetch souborů může selhat. Pro test spusť lokální server (python -m http.server) nebo nahraj na GitHub Pages.';
+        return null;
+      }
+      const attempt = await tryFetch(possiblePaths);
+      if(!attempt.ok){ dbg.textContent = 'Chyba: ' + attempt.error + '. Ověř, že edata.txt je ve stejném adresáři jako tento soubor (case-sensitive) a publikovaný.'; return null; }
+      dbg.textContent = 'Načteno z ' + attempt.path;
+      return attempt.text;
+    }
+
+    document.getElementById('ok').addEventListener('click', async ()=>{
+      const val = document.getElementById('pw').value;
+      const dbg = document.getElementById('debug'); dbg.textContent='';
+      if(val === CORRECT){
+        // úspěch: skryj formulář, ukaž obsah
+        document.getElementById('form-area').style.display='none';
+        document.getElementById('success-area').style.display='block';
+        const txt = await loadEdata();
+        document.getElementById('edata').value = txt || '';
+      } else {
+        dbg.textContent = 'Špatné heslo.';
+      }
+    });
+
+    document.getElementById('copy').addEventListener('click', async ()=>{
+      const txt = document.getElementById('edata').value;
+      try{
+        await navigator.clipboard.writeText(txt);
+        document.getElementById('debug').textContent = 'Zkopírováno do schránky.';
+      }catch(e){
+        // fallback
+        document.getElementById('edata').select();
+        try{ document.execCommand('copy'); document.getElementById('debug').textContent = 'Zkopírováno (fallback).'; }
+        catch(e2){ document.getElementById('debug').textContent = 'Kopírování selhalo — vyber text ručně.'; }
+      }
+    });
+
+    document.getElementById('refresh').addEventListener('click', async ()=>{
+      const txt = await loadEdata();
+      document.getElementById('edata').value = txt || '';
+    });
+
+    // enter key in password input
+    document.getElementById('pw').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); document.getElementById('ok').click(); } });
+  </script>
+</body>
+</html>
